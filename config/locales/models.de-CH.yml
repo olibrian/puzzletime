@@ -177,7 +177,8 @@ de-CH:
       employee:
         firstname: Vorname
         lastname: Nachname
-        shortname: Kürzel
+        # shortname: Kürzel
+        shortname: Hugenschwurbel
         passwd: Passwort
         management: Management
         department: Organisationseinheit
