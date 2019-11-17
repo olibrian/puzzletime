@@ -11,12 +11,33 @@ directory:
 
     bin/setup            # install gem dependencies and setup database (PostgreSQL)
     rake                 # run all the tests
+    rails db:setup       # prepare database
     rails server         # start the rails server
 
 Alternatively you can use the [dockerized development](doc/development/02_docker.md) environment.
 
 A more detailed development documentation in German can be found in [doc/development](doc/development/README.md). This is where you also find some [Deployment](doc/development/03_deployment.md) instructions
 
+## Heroku
+
+To deploy to heroku execute the following commands
+
+  heroku create
+  git push heroku ama/heroku_setup:master                     # push specific branch
+
+  heroku config:set RAILS_SERVE_STATIC_FILES=true             # serve assets
+  heroku run rails assets:precompile
+
+  heroku addons:create memcachier:dev                         # enable memcache
+
+  heroku run rails db:migrate                                                  # migrate db
+  heroku run 'ln -s /app/db/seeds/development /app/db/seeds/production && rails db:seed' # seed dev 
+  heroku open
+
+
+Then login using (username: mw, password: a) as credentials, if this doesnt work try to run 
+
+  heroku restart
 
 ## License
 
