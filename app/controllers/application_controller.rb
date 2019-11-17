@@ -9,12 +9,12 @@
 
 class ApplicationController < ActionController::Base
 
-  before_action :set_sentry_request_context
   protect_from_forgery with: :exception
 
   before_action :authenticate
-  before_action :set_sentry_user_context
   before_action :set_paper_trail_whodunnit
+  before_action :set_sentry_user_context, if: :sentry?
+  before_action :set_sentry_request_context, if: :sentry?
   check_authorization
 
   helper_method :sanitized_back_url, :current_user
@@ -45,7 +45,7 @@ class ApplicationController < ActionController::Base
         # allow ad-hoc login
         if params[:user].present? && params[:pwd].present?
           return true if login_with(params[:user], params[:pwd])
-          
+
           flash[:notice] = 'Ungültige Benutzerdaten'
         end
         redirect_to login_path(ref: request.url)
@@ -63,6 +63,10 @@ class ApplicationController < ActionController::Base
       reset_session
       session[:user_id] = @user.id
     end
+  end
+
+  def sentry?
+    ENV['SENTRY_DSN'].present?
   end
 
   def set_period
