@@ -32,11 +32,11 @@ To deploy to heroku execute the following commands
 
     heroku run rails db:migrate 
     heroku run 'ln -s /app/db/seeds/development /app/db/seeds/production && rails db:seed'
+    heroku restart
     heroku open
 
-Then login using (username: mw, password: a) as credentials, if this doesnt work try to run 
+Then login using (username: mw, password: a) as credentials
 
-    heroku restart
 
 ## License
 
