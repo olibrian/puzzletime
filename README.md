@@ -22,22 +22,21 @@ A more detailed development documentation in German can be found in [doc/develop
 
 To deploy to heroku execute the following commands
 
-  heroku create
-  git push heroku ama/heroku_setup:master                     # push specific branch
+    heroku create
+    git push heroku ama/heroku_setup:master
 
-  heroku config:set RAILS_SERVE_STATIC_FILES=true             # serve assets
-  heroku run rails assets:precompile
+    heroku config:set RAILS_SERVE_STATIC_FILES=true 
+    heroku run rails assets:precompile
 
-  heroku addons:create memcachier:dev                         # enable memcache
+    heroku addons:create memcachier:dev
 
-  heroku run rails db:migrate                                                  # migrate db
-  heroku run 'ln -s /app/db/seeds/development /app/db/seeds/production && rails db:seed' # seed dev 
-  heroku open
-
+    heroku run rails db:migrate 
+    heroku run 'ln -s /app/db/seeds/development /app/db/seeds/production && rails db:seed'
+    heroku open
 
 Then login using (username: mw, password: a) as credentials, if this doesnt work try to run 
 
-  heroku restart
+    heroku restart
 
 ## License
 
