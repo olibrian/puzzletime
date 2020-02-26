@@ -59,3 +59,19 @@ jobs:
         bundle exec rails db:create
         bundle exec rails db:migrate
         bundle exec rails test
+    - name: Webhook
+      uses: ybrin/secure-actions-webhook@0.1.2
+      if: github.ref == 'master' && success()
+      env:
+        REQUEST_URI: ${{ secrets.STATUS_REQUEST_URI }}
+        STATUS_APPLICATION: ${{ secrets.STATUS_APPLICATION }}
+        STATUS_TOKEN: ${{ secrets.STATUS_TOKEN }}
+        REQUEST_DATA: '{ "application": "$STATUS_APPLICATION", "token": "$STATUS_TOKEN", "status": "ok" }'
+    - name: Webhook
+      uses: ybrin/secure-actions-webhook@0.1.2
+      if: github.ref == 'master' && failure()
+      env:
+        REQUEST_URI: ${{ secrets.STATUS_REQUEST_URI }}
+        STATUS_APPLICATION: ${{ secrets.STATUS_APPLICATION }}
+        STATUS_TOKEN: ${{ secrets.STATUS_TOKEN }}
+        REQUEST_DATA: '{ "application": "$STATUS_APPLICATION", "token": "$STATUS_TOKEN", "status": "fail" }'
