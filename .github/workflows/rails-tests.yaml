@@ -4,6 +4,7 @@ on:
   push:
     branches:
     - 'master'
+    - 'feature/add_status_updates_to_actions'
     paths-ignore:
     - 'doc/**'
     - '**.md'
@@ -61,17 +62,19 @@ jobs:
         bundle exec rails test
     - name: Webhook
       uses: ybrin/secure-actions-webhook@0.1.2
-      if: github.ref == 'master' && success()
+      if: success()
       env:
         REQUEST_URI: ${{ secrets.STATUS_REQUEST_URI }}
         STATUS_APPLICATION: ${{ secrets.STATUS_APPLICATION }}
         STATUS_TOKEN: ${{ secrets.STATUS_TOKEN }}
         REQUEST_DATA: '{ "application": "$STATUS_APPLICATION", "token": "$STATUS_TOKEN", "status": "ok" }'
+        HMAC_SECRET: "secret_puzzletime_sentence_to_sign_everything"
     - name: Webhook
       uses: ybrin/secure-actions-webhook@0.1.2
-      if: github.ref == 'master' && failure()
+      if: cancelled()
       env:
         REQUEST_URI: ${{ secrets.STATUS_REQUEST_URI }}
         STATUS_APPLICATION: ${{ secrets.STATUS_APPLICATION }}
         STATUS_TOKEN: ${{ secrets.STATUS_TOKEN }}
         REQUEST_DATA: '{ "application": "$STATUS_APPLICATION", "token": "$STATUS_TOKEN", "status": "fail" }'
+        HMAC_SECRET: "secret_puzzletime_sentence_to_sign_everything"
