@@ -19,10 +19,6 @@ jobs:
   build:
     runs-on: 'ubuntu-latest'
 
-    strategy:
-      matrix:
-        ruby: [ '2.4', '2.5', '2.6' ]
-
     services:
       postgres:
         image: 'postgres:11'
@@ -38,14 +34,19 @@ jobs:
         image: 'memcached'
         ports: [ '11211:11211' ]
 
+    env:
+      REQUEST_URI: '${{ secrets.STATUS_URI }}/signal'
+      REQUEST_DATA: '{ "application": "${{ secrets.STATUS_MASTER_APPLICATION }}", "token": "${{ secrets.STATUS_MASTER_TOKEN }}", "status": "$STATUS" }'
+      HMAC_SECRET: "secret_puzzletime_sentence_to_sign_everything"
+
     steps:
     - name: 'Checkout'
       uses: actions/checkout@v2
 
-    - name: 'Set up Ruby ${{ matrix.ruby }}'
+    - name: 'Set up Ruby 2.5'
       uses: actions/setup-ruby@v1
       with:
-        ruby-version: ${{ matrix.ruby }}
+        ruby-version: '2.5'
 
     - name: 'Build and test with Rake'
       env:
@@ -60,21 +61,20 @@ jobs:
         bundle exec rails db:create
         bundle exec rails db:migrate
         bundle exec rails test
-    - name: Webhook
-      uses: ybrin/secure-actions-webhook@0.1.2
+
+    - name: Status Update Success 
+      uses: wei/curl@v1.1.1
       if: success()
       env:
-        REQUEST_URI: ${{ secrets.STATUS_REQUEST_URI }}
-        STATUS_APPLICATION: ${{ secrets.STATUS_APPLICATION }}
-        STATUS_TOKEN: ${{ secrets.STATUS_TOKEN }}
-        REQUEST_DATA: '{ "application": "$STATUS_APPLICATION", "token": "$STATUS_TOKEN", "status": "ok" }'
-        HMAC_SECRET: "secret_puzzletime_sentence_to_sign_everything"
-    - name: Webhook
-      uses: ybrin/secure-actions-webhook@0.1.2
+        STATUS: ok
+      with:
+        args: "-X POST ${{ env.REQUEST_URI }} -d application=${{ secrets.STATUS_MASTER_APPLICATION}} -d token=${{ secrets.STATUS_MASTER_TOKEN }} -d status=${{ env.STATUS }}"
+
+    - name: Status Update Failure
+      uses: wei/curl@v1.1.1
       if: cancelled()
       env:
-        REQUEST_URI: ${{ secrets.STATUS_REQUEST_URI }}
-        STATUS_APPLICATION: ${{ secrets.STATUS_APPLICATION }}
-        STATUS_TOKEN: ${{ secrets.STATUS_TOKEN }}
-        REQUEST_DATA: '{ "application": "$STATUS_APPLICATION", "token": "$STATUS_TOKEN", "status": "fail" }'
-        HMAC_SECRET: "secret_puzzletime_sentence_to_sign_everything"
+        STATUS: fail
+      with:
+        args: "-X POST ${{ env.REQUEST_URI }} -d application=${{ secrets.STATUS_MASTER_APPLICATION}} -d token=${{ secrets.STATUS_MASTER_TOKEN }} -d status=${{ env.STATUS }}"
+
