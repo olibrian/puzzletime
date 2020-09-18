@@ -3,7 +3,8 @@
 #  or later. See the COPYING file at the top-level directory or at
 #  https://github.com/puzzle/puzzletime.
 
-require File.expand_path('../boot', __FILE__)
+# require File.expand_path('../boot', __FILE__)
+require_relative 'boot'
 
 require 'rails/all'
 
@@ -18,6 +19,7 @@ module Puzzletime
   class Application < Rails::Application
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 5.2
+    # config.load_defaults 6.0
 
     config.active_record.belongs_to_required_by_default = false
 
